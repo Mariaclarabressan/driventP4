@@ -28,3 +28,22 @@ export async function postBooking(req: AuthenticatedRequest, res:Response){
         handleApplicationErrors(error, req, res);
     }
 }
+
+
+
+export async function updateBooking(req: AuthenticatedRequest, res: Response) {
+    const {userId} = req;
+    const {roomId} = req.params;
+    const {bookingId} = req.body;
+
+    try {
+
+        const booking = await bookingService.putBooking(userId, bookingId, Number(roomId));
+        const changeBooking = await bookingService.putBooking(Number(booking), bookingId, Number(roomId))
+        
+        res.status(httpStatus.OK).send({bookingId: changeBooking.id})
+    } catch (error) {
+        handleApplicationErrors(error, req, res)
+    }
+    
+}

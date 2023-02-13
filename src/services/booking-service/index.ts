@@ -70,25 +70,42 @@ async function postBookingByUser(userId: number, roomId: number) {
     return newBooking;
 }
 
+// TODO tests:
+  // userId with any booking --> status 404 (NotFound)ok
+  // invalid roomId --> status 404 (NotFound) 
+  // room full / without space --> status 403 (Forbidden)
+  // roomId dont belong to userId --> status 401 (Unauthorized)
+  // update created --> status 200 (OK) + body: { id: updatedBooking.id }
+
+
 async function putBooking (userId: number, bookingId: number, roomId: number) {
     
     const findUserWithBooking = await bookingRepository.findBookingByUser(userId); 
+    
+    console.log(findUserWithBooking);
+    if(!findUserWithBooking) {
+        throw notFoundError()
+    }
+
+    if( findUserWithBooking.id !== bookingId) {
+        throw ForbidenError();
+    }    
 
     const findRoomByUser = await hotelRepository.findRoom(roomId);
-
-
-    const roomPeople = await bookingRepository.findAllBookingsByRoom(roomId);
-
-
-    if(!findUserWithBooking || findUserWithBooking.id !== bookingId) {
-        throw ForbidenError();
-    }
 
     if(!findRoomByUser) {
         throw notFoundError();
     }
+    
+    const roomPeople = await bookingRepository.findAllBookingsByRoom(roomId);
+    
+    if(roomPeople.length <= findRoomByUser.capacity){
+        throw ForbidenError();
+    }
 
-    //if(findRoomByUser.capacity => roomPeople.)
+    return await bookingRepository.updateBooking(bookingId, roomId);
+
+    
 }
 
 const BookingService = {

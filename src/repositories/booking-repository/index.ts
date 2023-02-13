@@ -49,13 +49,25 @@ async function findManyBookingByUserId( userId: number) {
 
 }
 
+const updateBooking = async (bookingId: number, roomId: number) => {
+    return prisma.booking.update({
+      where: {
+        id: bookingId,
+      },
+      data: {
+        roomId: roomId,
+      },
+    });
+  };
+
 const bookingRepository = {
     findBookingByRoom,
     findBookingByUser,
     postNewBooking,
     createNewBooking,
     findAllBookingsByRoom,
-    findManyBookingByUserId
+    findManyBookingByUserId,
+    updateBooking
 };
 
 export default bookingRepository;
